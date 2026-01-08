@@ -1,1 +1,754 @@
-
+{
+  "name": "JOB VACANCY AUTOMATION",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Ini ada URL lowongan: {{ $('SWITCH (DISTINGUISHING BETWEEN GREETINGS AND LINKS)').item.json.message.text }}\n\nBerikut adalah isi teks dari website tersebut:{{ $json.data }} ",
+        "options": {
+          "systemMessage": "Kamu adalah asisten cerdas spesialis ekstraksi data lowongan kerja. Tugasmu adalah membaca teks mentah dari halaman web lowongan kerja dan mengubahnya menjadi format JSON yang valid.\n\nInstruksi Khusus:\n1. Analisis teks yang diberikan dan ekstrak informasi sesuai key JSON di bawah ini.\n2. Keluarkan HANYA objek JSON murni (Raw JSON).\n3. DILARANG KERAS menggunakan formatting Markdown (jangan pakai tanda ```json atau ```). Langsung mulai dengan kurung kurawal '{'.\n4. Gunakan Bahasa Indonesia untuk isi datanya.\n\nStruktur JSON yang wajib kamu buat:\n{\n  \"nama_perusahaan\": \"Nama perusahaan (jika tidak ditemukan, tulis 'Tidak diketahui')\",\n  \"posisi\": \"Judul posisi pekerjaan\",\n  \"link\": \"Masukkan URL asli lowongan ini jika disediakan dalam prompt, jika tidak, biarkan kosong\",\n  \"sumber\": \"Deteksi sumber lowongan (contoh: LinkedIn, Jobstreet, Glints, atau Website Perusahaan)\",\n  \"status\": \"Belum Daftar\",\n  \"deadline\": \"Cari tanggal penutupan. Jika tidak ada tanggal spesifik, tulis 'Tidak disebutkan'\",\n  \"catatan\": \"Rangkum maksimal 2 kalimat mengenai persyaratan skill utama atau kualifikasi penting (contoh: 'Wajib menguasai Python dan SQL. Pengalaman min 2 tahun.')\"\n}\n\nPastikan output adalah JSON valid tanpa komentar tambahan."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -112,
+        352
+      ],
+      "id": "be1fcc31-3278-4def-bcca-4d8f031b989d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('TELEGRAM TRIGGER').item.json.message.chat.id }}",
+        "text": "Data sudah diunggah! Silahkan cek URL berikut, ya! https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=sharing",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        880,
+        288
+      ],
+      "id": "06276051-c2d5-4a87-95d3-6f65abe9c0d9",
+      "name": "SEND SUCCESS MESSAGE",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "N8N Internship Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "NAMA PERUSAHAAN": "={{ $json.nama_perusahaan }}",
+            "POSISI": "={{ $json.posisi }}",
+            "LINK LOWONGAN": "={{ $json.link }}",
+            "SUMBER": "={{ $json.sumber }}",
+            "STATUS": "={{ $json.status }}",
+            "DEADLINE": "={{ $json.deadline }}",
+            "CATATAN": "={{ $json.catatan }}"
+          },
+          "matchingColumns": [
+            "LINK LOWONGAN"
+          ],
+          "schema": [
+            {
+              "id": "NAMA PERUSAHAAN",
+              "displayName": "NAMA PERUSAHAAN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "POSISI",
+              "displayName": "POSISI",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LINK LOWONGAN",
+              "displayName": "LINK LOWONGAN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SUMBER",
+              "displayName": "SUMBER",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "STATUS",
+              "displayName": "STATUS",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DEADLINE",
+              "displayName": "DEADLINE",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CATATAN",
+              "displayName": "CATATAN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        288
+      ],
+      "id": "bd8e227e-aa80-439a-92d5-ec82c44aff59",
+      "name": "CREATE A NEW ROW IN SHEETS",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawText = $input.item.json.output || $input.item.json.text || \"\";\nlet cleanText = rawText.replace(/```json/g, \"\").replace(/```/g, \"\");\nconst firstBrace = cleanText.indexOf('{');\nconst lastBrace = cleanText.lastIndexOf('}');\n\nif (firstBrace !== -1 && lastBrace !== -1) {\n  cleanText = cleanText.substring(firstBrace, lastBrace + 1);\n}\n\ntry {\n  const jsonData = JSON.parse(cleanText);\n  return { json: jsonData };\n} catch (error) {\n  return {\n    json: {\n      error: \"Gagal parsing JSON\",\n      original_text: rawText\n    }\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        352
+      ],
+      "id": "745c3efc-38ce-4ff0-943e-c13410cf463c",
+      "name": "PARSING FROM AI RAW OUTPUT TO JSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $('TELEGRAM TRIGGER').first().json.message.text;\n\n\nfunction getValue(keyword) {\n  const regex = new RegExp(`${keyword}:\\\\s*(.*)`);\n  const match = text.match(regex);\n  return match ? match[1].trim() : null;\n}\n\nreturn {\n  json: {\n    nama_perusahaan: getValue('Nama Perusahaan'),\n    posisi: getValue('Posisi'),\n    link: getValue('Link Lowongan'),\n    sumber: getValue('Sumber \\\\(LinkedIn/Web/Email\\\\)'), \n    status: getValue('Status \\\\(Belum Daftar/Applied/Interview/Rejected\\\\)'),\n    deadline: getValue('Deadline'),\n    catatan: getValue('Catatan')\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        192
+      ],
+      "id": "ed5f1cec-413d-47d1-a0bb-301fe8c9a34c",
+      "name": "PARSING FROM TELEGRAM CHAT OUTPUT TO JSON"
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "chatId": "={{ $('TELEGRAM TRIGGER').item.json.message.chat.id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        192
+      ],
+      "id": "7e5828f1-1e05-4700-9a08-8ff7a70ea02d",
+      "name": "GET CHAT FROM USER",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "z-ai/glm-4.5-air:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        512
+      ],
+      "id": "11f5dc2a-1fde-42c8-bcbb-bd00db08764e",
+      "name": "AI MODEL: GLM-4.5 AIR",
+      "credentials": {
+        "openRouterApi": {
+          "id": "YOUR_OPENROUTER_CREDENTIAL_ID",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('TELEGRAM TRIGGER').item.json.message.chat.id }}",
+        "text": "Maaf, link tersebut diproteksi oleh CAPTCHA, Sehingga tidak bisa diproses otomatis, silahkan input manual dengan format sebagai berikut, ya!\nNama Perusahaan:  \nPosisi:  \nLink Lowongan:  \nSumber (LinkedIn/Web/Email):  \nStatus (Belum Daftar/Applied/Interview/Rejected):  \nDeadline:  \nCatatan:",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        192
+      ],
+      "id": "22538f6d-00b6-4212-a970-7e63a9476a0a",
+      "name": "SEND MESSAGE TO USER FOR MANUAL ENTRY",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "Verify you are human",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "leftValue": "={{ $json.data }}",
+              "rightValue": "captcha",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "leftValue": "={{ $json.data.length }}",
+              "rightValue": 300,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        864,
+        -64
+      ],
+      "id": "b9cf04c1-64ce-47ef-807d-3ea74d795cde",
+      "name": "FALLBACK LOGIC IF WEB REQUIRED CAPTCHA"
+    },
+    {
+      "parameters": {
+        "url": "=https://r.jina.ai/{{ $('TELEGRAM TRIGGER').item.json.message.text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        656,
+        -64
+      ],
+      "id": "395ebeba-b189-4c49-8979-55495c01eeaf",
+      "name": "HTTP REQUEST TO JINA AI",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('TELEGRAM TRIGGER').item.json.message.from.id }}",
+        "text": "Maaf link lowongan magang/kerja sudah pernah dikirim, kirim yang lain, ya!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        -240
+      ],
+      "id": "9da30f9a-6b74-4473-82e5-d19ab2b9a69f",
+      "name": "MESSAGE TO USER (LINK ALREADY IN THE SPS, ENTER A NEW LINK)",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('TELEGRAM TRIGGER').item.json.message.from.id }}",
+        "text": "Yeay link nya belum ada di sheet, otw ditambahin ya!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        448,
+        -64
+      ],
+      "id": "f5814117-efd3-48e7-abf1-bbdae9d70ec7",
+      "name": "MESSAGE TO USER (LINK NOT IN SPS, INPUT LINK TO SPS)",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json[\"LINK LOWONGAN\"] }}",
+              "rightValue": "={ }",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        -96
+      ],
+      "id": "a40e0875-b23a-4aa9-8be4-c55cf3b309c7",
+      "name": "CHECK LOGIC"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "list",
+          "cachedResultName": "N8N Internship Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/YOUR_GOOGLE_SHEET_ID/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "LINK LOWONGAN",
+              "lookupValue": "={{ $('SWITCH (DISTINGUISHING BETWEEN GREETINGS AND LINKS)').item.json.message.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -16,
+        -96
+      ],
+      "id": "f9345b66-5999-449e-bca6-b814fca4bc4b",
+      "name": "SPREADSHEET CHECK",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "YOUR_GOOGLE_SHEETS_CREDENTIAL_ID",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message.from.id }}",
+        "text": "Tunggu sebentar ya, data sedang diperiksa terlebih dahulu....",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        -96
+      ],
+      "id": "dad239e7-223b-4916-afe1-0a059825894f",
+      "name": "MESSAGE TO CHECK SPREADSHEET",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('TELEGRAM TRIGGER').item.json.message.from.id }}",
+        "text": "Halo, Silahkan kirimkan link lokernya ya!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        -288
+      ],
+      "id": "dd860dba-70b1-4413-bd00-c71ed7e786f4",
+      "name": "MESSAGE TO SAY HELLO",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text.toLowerCase() }}",
+                    "rightValue": "=(hallo|hello|apa kabar|hi|pagi|siang|sore|malam)",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Sapaan"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.text }}",
+                    "rightValue": "https://",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Data Lowongan"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        -176
+      ],
+      "id": "f1a63947-72df-4c97-b28d-9428c68dd818",
+      "name": "SWITCH (DISTINGUISHING BETWEEN GREETINGS AND LINKS)"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -736,
+        -112
+      ],
+      "id": "e10b8844-0013-4caf-8118-33a096375e0e",
+      "name": "TELEGRAM TRIGGER",
+      "credentials": {
+        "telegramApi": {
+          "id": "YOUR_TELEGRAM_CREDENTIAL_ID",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "PARSING FROM AI RAW OUTPUT TO JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CREATE A NEW ROW IN SHEETS": {
+      "main": [
+        [
+          {
+            "node": "SEND SUCCESS MESSAGE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PARSING FROM AI RAW OUTPUT TO JSON": {
+      "main": [
+        [
+          {
+            "node": "CREATE A NEW ROW IN SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PARSING FROM TELEGRAM CHAT OUTPUT TO JSON": {
+      "main": [
+        [
+          {
+            "node": "CREATE A NEW ROW IN SHEETS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET CHAT FROM USER": {
+      "main": [
+        [
+          {
+            "node": "PARSING FROM TELEGRAM CHAT OUTPUT TO JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI MODEL: GLM-4.5 AIR": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SEND MESSAGE TO USER FOR MANUAL ENTRY": {
+      "main": [
+        [
+          {
+            "node": "GET CHAT FROM USER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FALLBACK LOGIC IF WEB REQUIRED CAPTCHA": {
+      "main": [
+        [
+          {
+            "node": "SEND MESSAGE TO USER FOR MANUAL ENTRY",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP REQUEST TO JINA AI": {
+      "main": [
+        [
+          {
+            "node": "FALLBACK LOGIC IF WEB REQUIRED CAPTCHA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MESSAGE TO USER (LINK NOT IN SPS, INPUT LINK TO SPS)": {
+      "main": [
+        [
+          {
+            "node": "HTTP REQUEST TO JINA AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHECK LOGIC": {
+      "main": [
+        [
+          {
+            "node": "MESSAGE TO USER (LINK ALREADY IN THE SPS, ENTER A NEW LINK)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MESSAGE TO USER (LINK NOT IN SPS, INPUT LINK TO SPS)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SPREADSHEET CHECK": {
+      "main": [
+        [
+          {
+            "node": "CHECK LOGIC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MESSAGE TO CHECK SPREADSHEET": {
+      "main": [
+        [
+          {
+            "node": "SPREADSHEET CHECK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MESSAGE TO SAY HELLO": {
+      "main": [
+        []
+      ]
+    },
+    "SWITCH (DISTINGUISHING BETWEEN GREETINGS AND LINKS)": {
+      "main": [
+        [
+          {
+            "node": "MESSAGE TO SAY HELLO",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "MESSAGE TO CHECK SPREADSHEET",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TELEGRAM TRIGGER": {
+      "main": [
+        [
+          {
+            "node": "SWITCH (DISTINGUISHING BETWEEN GREETINGS AND LINKS)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "tags": []
+}
